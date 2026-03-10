@@ -118,7 +118,7 @@ def get_llm(
         "LLM_MODEL", "openai/gpt-oss-20b"
     )
     llm = HuggingFaceEndpoint(
-        repo_id=model_name,
+        repo_id="openai/gpt-oss-20b",
         task="text-generation",
         max_new_tokens=max_new_tokens,
         temperature=temperature,

@@ -8,7 +8,7 @@ embeddings:
 
 llm:
   provider: "huggingface_hub"
-  model_name: "meta-llama/Llama-3.1-70B-Instruct"          # e.g. "mistralai/Mistral-7B-Instruct-v0.1"
+  model_name: "openai/gpt-oss-20b"          # e.g. "mistralai/Mistral-7B-Instruct-v0.1"
   temperature: 0.3
   max_new_tokens: 512
 
