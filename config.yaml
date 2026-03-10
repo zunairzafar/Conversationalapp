@@ -8,24 +8,27 @@ app:
 pdf_processing:
   chunk_size: 1000
   chunk_overlap: 200
-  loader: "pypdf"               # "pypdf" | "unstructured"
+  loader: "pypdf"
 
 embeddings:
   provider: "huggingface"
   model_name: "sentence-transformers/all-MiniLM-L6-v2"
-  device: "cpu"                 # "cpu" | "cuda"
+  device: "cpu"
 
 vector_store:
   provider: "faiss"
   persist_directory: "models/retriever"
 
 llm:
-  provider: "huggingface_endpoint"
-  model_name: "openai/gpt-oss-20b"
+  provider: "groq"
+  # Free Groq models — reliable from any cloud IP, no endpoint cold-starts
+  # Get your free API key at: https://console.groq.com
+  model_name: "llama-3.1-8b-instant"
+  # Fallbacks (automatic): llama3-8b-8192, gemma2-9b-it, mixtral-8x7b-32768
   temperature: 0.1
   max_new_tokens: 512
 
 retriever:
-  search_type: "similarity"     # "similarity" | "mmr"
+  search_type: "similarity"
   search_kwargs:
     k: 4
