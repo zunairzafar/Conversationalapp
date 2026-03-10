@@ -1,48 +1,50 @@
 """
 LangChain-specific utilities — prompt templates, LLM factory, retriever builder.
 
-Covers:
-    - RAG QA prompt template      (Step 11)
-    - LLM instantiation via HuggingFaceHub / HuggingFaceEndpoint
-    - Vector-store → retriever    (Step 8-9)
+Uses Groq as the LLM provider (free tier, cloud-reliable, no gated models).
+Get a free API key at: https://console.groq.com
 """
 
 from __future__ import annotations
 
+import logging
 import os
 from pathlib import Path
 
-from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
-from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
+from langchain_core.prompts import PromptTemplate
+from langchain_groq import ChatGroq
+
+logger = logging.getLogger(__name__)
+
+# Groq free-tier models — tried in order if one is unavailable
+FALLBACK_MODELS = [
+    "llama-3.1-8b-instant",
+    "llama3-8b-8192",
+    "gemma2-9b-it",
+    "mixtral-8x7b-32768",
+]
 
 
-def _load_hf_token() -> None:
-    """Load HF_TOKEN into os.environ from Streamlit secrets or .env fallback."""
-    # Already set (e.g. by a previous call or system env)
-    if os.environ.get("HF_TOKEN"):
+def _load_groq_token() -> None:
+    """Load GROQ_API_KEY from Streamlit secrets or .env fallback."""
+    if os.environ.get("GROQ_API_KEY"):
         return
-
-    # 1️⃣  Try Streamlit secrets (used on Streamlit Cloud)
     try:
         import streamlit as st
-        token = st.secrets.get("HF_TOKEN", "")
-        if token:
-            os.environ["HF_TOKEN"] = token
+        if hasattr(st, "secrets") and "GROQ_API_KEY" in st.secrets:
+            os.environ["GROQ_API_KEY"] = st.secrets["GROQ_API_KEY"]
             return
     except Exception:
-        pass  # not running inside Streamlit, or secrets not configured
-
-    # 2️⃣  Fallback: .env file (local development)
+        pass
     try:
         from dotenv import load_dotenv
         _PROJECT_ROOT = Path(__file__).resolve().parents[2]
         load_dotenv(_PROJECT_ROOT / ".env")
-        os.environ["HF_TOKEN"] = os.getenv("HF_TOKEN", "")
     except Exception:
         pass
 
 
-_load_hf_token()
+_load_groq_token()
 
 # ---------------------------------------------------------------------------
 # Prompt templates
@@ -64,7 +66,8 @@ Question: {question}
 Answer:"""
 
 _QUERY_REWRITE_TEMPLATE = """\
-Given the following chat history and a follow-up question, rewrite the follow-up question to be a standalone question that includes all necessary context.
+Given the following chat history and a follow-up question, rewrite the follow-up question \
+to be a standalone question that includes all necessary context.
 If the question is already standalone, return it as-is. Only return the rewritten question, nothing else.
 
 Chat History:
@@ -76,7 +79,6 @@ Standalone Question:"""
 
 
 def get_qa_prompt_template() -> PromptTemplate:
-    """Return the default RAG question-answering prompt template."""
     return PromptTemplate(
         input_variables=["chat_history", "context", "question"],
         template=_RAG_QA_TEMPLATE,
@@ -84,7 +86,6 @@ def get_qa_prompt_template() -> PromptTemplate:
 
 
 def get_query_rewrite_template() -> PromptTemplate:
-    """Return template that rewrites follow-up questions into standalone queries."""
     return PromptTemplate(
         input_variables=["chat_history", "question"],
         template=_QUERY_REWRITE_TEMPLATE,
@@ -92,7 +93,7 @@ def get_query_rewrite_template() -> PromptTemplate:
 
 
 # ---------------------------------------------------------------------------
-# LLM factory
+# LLM factory — Groq (free, fast, cloud-reliable)
 # ---------------------------------------------------------------------------
 
 def get_llm(
@@ -101,31 +102,14 @@ def get_llm(
     max_new_tokens: int = 512,
     **kwargs,
 ):
-    """Instantiate and return a ChatHuggingFace LLM via HuggingFaceEndpoint.
-
-    Requires HF_TOKEN in environment / Streamlit secrets / .env file.
-    """
-    _load_hf_token()  # ensure token is in os.environ
-
-    token = os.environ.get("HF_TOKEN", "")
-    if not token:
-        raise RuntimeError(
-            "HF_TOKEN not found. Set it in Streamlit secrets, "
-            "environment variables, or a .env file."
-        )
-
-    model_name = model_name or os.getenv(
-        "LLM_MODEL", "openai/gpt-oss-20b"
-    )
-    llm = HuggingFaceEndpoint(
-        repo_id="openai/gpt-oss-20b",
-        task="text-generation",
-        max_new_tokens=max_new_tokens,
+    """Instantiate a ChatGroq LLM. Requires GROQ_API_KEY in env/secrets."""
+    candidate = model_name or FALLBACK_MODELS[0]
+    return ChatGroq(
+        model=candidate,
         temperature=temperature,
-        huggingfacehub_api_token=token,
-        **kwargs,
+        max_tokens=max_new_tokens,
+        groq_api_key=os.environ.get("GROQ_API_KEY", ""),
     )
-    return ChatHuggingFace(llm=llm)
 
 
 # ---------------------------------------------------------------------------
@@ -133,7 +117,6 @@ def get_llm(
 # ---------------------------------------------------------------------------
 
 def get_retriever(vector_store, search_type: str = "similarity", search_kwargs: dict | None = None):
-    """Wrap a FAISS / Chroma vector store in a LangChain retriever."""
     search_kwargs = search_kwargs or {"k": 4}
     return vector_store.as_retriever(
         search_type=search_type,
