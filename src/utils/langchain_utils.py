@@ -103,8 +103,17 @@ def get_llm(
 ):
     """Instantiate and return a ChatHuggingFace LLM via HuggingFaceEndpoint.
 
-    Requires HF_TOKEN in environment / .env file.
+    Requires HF_TOKEN in environment / Streamlit secrets / .env file.
     """
+    _load_hf_token()  # ensure token is in os.environ
+
+    token = os.environ.get("HF_TOKEN", "")
+    if not token:
+        raise RuntimeError(
+            "HF_TOKEN not found. Set it in Streamlit secrets, "
+            "environment variables, or a .env file."
+        )
+
     model_name = model_name or os.getenv(
         "LLM_MODEL", "meta-llama/Llama-3.1-8B-Instruct"
     )
@@ -113,6 +122,7 @@ def get_llm(
         task="text-generation",
         max_new_tokens=max_new_tokens,
         temperature=temperature,
+        huggingfacehub_api_token=token,
         **kwargs,
     )
     return ChatHuggingFace(llm=llm)

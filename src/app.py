@@ -93,7 +93,7 @@ def main() -> None:
             ]
 
             if new_files:
-                if st.button(f"🚀 Process {len(new_files)} new PDF(s)", type="primary"):
+                if st.button(f"🚀 Click here to Process {len(new_files)} new PDF(s)", type="primary"):
                     saved_paths: list[Path] = []
                     with st.spinner("Saving uploads…"):
                         for uf in new_files:
