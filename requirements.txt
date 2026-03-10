@@ -13,7 +13,6 @@ faiss-cpu>=1.8
 
 # PDF processing
 pypdf>=4.0
-unstructured>=0.15
 
 # UI
 streamlit>=1.38

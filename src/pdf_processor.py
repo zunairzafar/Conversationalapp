@@ -13,7 +13,7 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 
-from langchain_community.document_loaders import PyPDFLoader, UnstructuredFileLoader
+from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
 
@@ -49,6 +49,7 @@ class PDFProcessor:
         """Return the appropriate document loader."""
         file_path = str(file_path)
         if self.loader_type == "unstructured":
+            from langchain_community.document_loaders import UnstructuredFileLoader
             return UnstructuredFileLoader(file_path, mode="elements")
         return PyPDFLoader(file_path)
 
