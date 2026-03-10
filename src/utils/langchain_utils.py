@@ -115,7 +115,7 @@ def get_llm(
         )
 
     model_name = model_name or os.getenv(
-        "LLM_MODEL", "meta-llama/Llama-3.1-8B-Instruct"
+        "LLM_MODEL", "openai/gpt-oss-20b"
     )
     llm = HuggingFaceEndpoint(
         repo_id=model_name,
