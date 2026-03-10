@@ -1,0 +1,30 @@
+# Core LangChain
+langchain>=0.3
+langchain-community>=0.3
+langchain-core>=0.3
+langchain-huggingface>=0.1
+
+# Embeddings & LLM
+huggingface-hub>=0.25
+sentence-transformers>=3.0
+
+# Vector stores
+faiss-cpu>=1.8
+
+# PDF processing
+pypdf>=4.0
+unstructured>=0.15
+
+# UI
+streamlit>=1.38
+
+# Validation & config
+pydantic>=2.9
+python-dotenv>=1.0
+pyyaml>=6.0
+
+# Testing
+pytest>=8.0
+
+# Testing
+pytest>=8.0

@@ -1,0 +1,21 @@
+# Model configuration
+# Fill in actual values during implementation
+
+embeddings:
+  provider: "huggingface"
+  model_name: "sentence-transformers/all-MiniLM-L6-v2"
+  device: "cpu"
+
+llm:
+  provider: "huggingface_hub"
+  model_name: "meta-llama/Llama-3.1-70B-Instruct"          # e.g. "mistralai/Mistral-7B-Instruct-v0.1"
+  temperature: 0.3
+  max_new_tokens: 512
+
+vector_store:
+  provider: "faiss"       # "faiss" | "chroma"
+  persist_directory: "models/retriever"
+
+text_splitter:
+  chunk_size: 1000
+  chunk_overlap: 200

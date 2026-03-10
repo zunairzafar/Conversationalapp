@@ -1,0 +1,31 @@
+# Project-wide configuration
+# --------------------------
+
+app:
+  title: "RAG PDF Chat"
+  description: "Chat with your PDF documents using Retrieval-Augmented Generation"
+
+pdf_processing:
+  chunk_size: 1000
+  chunk_overlap: 200
+  loader: "pypdf"               # "pypdf" | "unstructured"
+
+embeddings:
+  provider: "huggingface"
+  model_name: "sentence-transformers/all-MiniLM-L6-v2"
+  device: "cpu"                 # "cpu" | "cuda"
+
+vector_store:
+  provider: "faiss"
+  persist_directory: "models/retriever"
+
+llm:
+  provider: "huggingface_endpoint"
+  model_name: "meta-llama/Llama-3.1-8B-Instruct"
+  temperature: 0.1
+  max_new_tokens: 512
+
+retriever:
+  search_type: "similarity"     # "similarity" | "mmr"
+  search_kwargs:
+    k: 4
