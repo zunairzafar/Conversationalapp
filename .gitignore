@@ -24,9 +24,14 @@ data/processed/*
 # Vector stores
 models/retriever/*.faiss
 models/retriever/*.pkl
+src/models/retriever/*.faiss
+src/models/retriever/*.pkl
 models/generator/*
 !models/retriever/.gitkeep
 !models/generator/.gitkeep
+
+# Large files
+*.pdf
 
 # Streamlit
 .streamlit/
