@@ -12,7 +12,7 @@ import logging
 from pathlib import Path
 
 from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
+from langchain_community.vectorstores.faiss import FAISS
 from langchain_core.documents import Document
 
 logger = logging.getLogger(__name__)
