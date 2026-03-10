@@ -1,15 +1,18 @@
+# ⚠️  Add .python-version file containing "3.12" to your repo root.
+
 # Core LangChain
 langchain==0.3.25
 langchain-community==0.3.23
 langchain-core==0.3.58
+langchain-groq==0.3.2
 langchain-huggingface==0.1.2
 langchain-text-splitters==0.3.8
 
-# Embeddings & LLM
+# Embeddings (HuggingFace — local, no API needed)
 huggingface-hub==0.30.1
 sentence-transformers==3.4.1
 
-# Vector stores
+# Vector store
 faiss-cpu==1.10.0
 
 # PDF processing
@@ -20,7 +23,6 @@ streamlit==1.44.1
 
 # Validation & config
 pydantic==2.11.1
-pydantic-settings==2.8.1
 python-dotenv==1.1.0
 pyyaml==6.0.2
 
